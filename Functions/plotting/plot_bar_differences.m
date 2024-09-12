@@ -1,4 +1,4 @@
-function plot_bar_differences(md_list, colormaps, legend_names, yaxis_scaling)
+function [vol_ref, time_ref] = plot_bar_differences(md_list, colormaps, legend_names, yaxis_scaling)
 
     time_ref = floor(cell2mat({md_list(1).results.TransientSolution(:).time}));
     % yr_times = floor(times);
@@ -33,7 +33,7 @@ function plot_bar_differences(md_list, colormaps, legend_names, yaxis_scaling)
     end
     
     yyaxis right
-    max_percentage = max(max(abs(round(array./50) * 50)))
+    max_percentage = max(max(abs(round(array./50) * 50)));
     if max_percentage > 50
         max_Gt = 300;
         gt_step = 50;
@@ -44,9 +44,9 @@ function plot_bar_differences(md_list, colormaps, legend_names, yaxis_scaling)
         percentage_step = 10;
     end
     % patch([1930, 1930, 2023, 2023], [0, patch_max, patch_max, 0], [0.7, 0.7, 0.7], 'FaceAlpha', 0.5, 'EdgeColor', 'none')
-
+    barw = 3;
     yyaxis left
-    hB=bar(1933:2021, array_Gt(1:end, :), 'FaceColor','flat','EdgeColor','none');
+    hB=bar(1933:2021, array_Gt(1:end, :), 'FaceColor','flat','EdgeColor','none', 'BarWidth', barw);
     % set color and transparency of bars
     for i=1:length(md_list)-1
         hB(i).CData = colormaps(i+1,:);
@@ -59,20 +59,20 @@ function plot_bar_differences(md_list, colormaps, legend_names, yaxis_scaling)
     ytl = get(gca, 'YTick');                                    % Get Controlling Left Ticks
 
     ax.YAxis(1).Color = [0, 0, 0];
-    ylabel({'Difference (Gt)'},'FontSize', 12)
+    ylabel({'Difference (Gt)'})
 
     yyaxis right
-    hB2=bar(1933:2021, array(1:end, :), 'FaceColor','none','EdgeColor','none');
+    hB2=bar(1933:2021, array(1:end, :), 'FaceColor','none','EdgeColor','none', 'BarWidth', barw);
 
     ax = gca;
     ax.YAxis(end).Limits = [-max_percentage max_percentage];
     ax.YAxis(end).TickValues = [-max_percentage:percentage_step:max_percentage];
     ax.YAxis(end).TickLabels = [-max_percentage:percentage_step:max_percentage];
     ax.YAxis(end).Color = [0, 0, 0];
-    xlabel('Year', 'FontSize', 12')
-    ylabel({'Relative';'difference (%)'},'FontSize', 12)
-    ytr = get(gca, 'YTick')                                    % Get Right Tick Values
-    ytrv = linspace(min(ytr), max(ytr), numel(ytl))            % Create New Right Tick Values Matching Number Of Left Ticks
+    xlabel('Year')
+    ylabel({'Relative';'difference (%)'})
+    ytr = get(gca, 'YTick');                                    % Get Right Tick Values
+    ytrv = linspace(min(ytr), max(ytr), numel(ytl));            % Create New Right Tick Values Matching Number Of Left Ticks
     ytrc = compose('%.0f',ytrv);                                % Tick Label Cell Array
     set(gca, 'YTick',ytrv, 'YTickLabel',ytrc) 
     grid on
@@ -81,11 +81,15 @@ function plot_bar_differences(md_list, colormaps, legend_names, yaxis_scaling)
 
     % print median of difference with min and max for each experiment
     for i=1:length(md_list)-1
-        disp(['Median difference is ' num2str(median(array_Gt(:,i)), '%.2f') ' Gt, min=' num2str(min(array_Gt(:,i)), '%.2f') ' Gt, max=' num2str(max(array_Gt(:,i)), '%.2f') ' Gt for ' legend_names{i+1} '.'])
+        disp(['Median difference is ' num2str(median(array_Gt(:,i)), '%.3f') ' Gt, mad=' num2str(mad(array_Gt(:,i), 1), '%.3f') ' Gt, min=' num2str(min(array_Gt(:,i)), '%.3f') ' Gt, max=' num2str(max(array_Gt(:,i)), '%.3f') ' Gt for ' legend_names{i+1} '.'])
     end
     disp(' ')
     for i=1:length(md_list)-1
-        disp(['Median difference is ' num2str(median(array(:,i)), '%.2f') ' %, min=' num2str(min(array(:,i)), '%.2f') ' %, max=' num2str(max(array(:,i)), '%.2f') ' % for ' legend_names{i+1} '.'])
+        disp(['Median difference is ' num2str(median(array(:,i)), '%.3f') ' %, mad=' num2str(mad(array(:,i), 1), '%.3f') ' %, min=' num2str(min(array(:,i)), '%.3f') ' %, max=' num2str(max(array(:,i)), '%.3f') ' % for ' legend_names{i+1} '.'])
     end
     disp(' ')
+    % Write to median, mad, min, max to table
+    T = table(legend_names(2:end)', median(array_Gt)', mad(array_Gt, 1)', min(array_Gt)', max(array_Gt)', median(array)', mad(array, 1)', min(array)', max(array)', ...
+                'VariableNames', {'Experiment', 'Median_Gt', 'Mad_Gt', 'Min_Gt', 'Max_Gt', 'Median_perc', 'Mad_perc', 'Min_perc', 'Max_perc'});
+    writetable(T, 'bar_differences.csv')
 end

@@ -3,7 +3,7 @@ function [] = flowline_test(md, pos1, pos2)
     % close all
 
     glacier = 'Kangerlussuaq';
-    Nf = 2;
+    Nf = length(pos1)
 
     %% Load model {{{
     projPath = '/home/eyhli/IceModeling/work/lia_kq/Models/Model_kangerlussuaq_lia_param.mat';
@@ -26,8 +26,12 @@ function [] = flowline_test(md, pos1, pos2)
         % y0 = [-2294540, -2296520, -2298880];
         % x0 = [507680, 503080.707450693];
         % y0 = [-2297520, -2298408.27018442];
-        x0 = [pos1(1), pos2(1)];
-        y0 = [pos1(2), pos2(2)];
+        for i = 1: Nf
+            x0(i) = pos1(i);
+            y0(i) = pos2(i);
+        end
+        % x0 = [pos1(1), pos2(1)];
+        % y0 = [pos1(2), pos2(2)];
 
         xmin = 361900; xmax = 510001;
         ymin = -2310000; ymax = -2160900;
@@ -37,7 +41,7 @@ function [] = flowline_test(md, pos1, pos2)
         xmin = -275000; xmax = 316000;
         ymin = -2586545; ymax = -2550000;
     end
-
+    x0
     steps = 0;
     % org=organizer('repository', [projPath, 'Models', folder], 'prefix', ['Model_' glacier '_'], 'steps', steps);
     % md = loadmodel(org, stepName);
@@ -107,7 +111,8 @@ function [] = flowline_test(md, pos1, pos2)
     %}}}
     %% Save data{{{
     if saveflag
-        save(['/home/eyhli/IceModeling/work/lia_kq/KG_flowlines.mat'], 'x0', 'y0', 'flowlineList');
+        % save(['/home/eyhli/IceModeling/work/lia_kq/KG_flowlines.mat'], 'x0', 'y0', 'flowlineList');
+        save(['/home/eyhli/IceModeling/work/calving_kg/Data/Flowlines/KG_flowlines.mat'], 'x0', 'y0', 'flowlineList');
     end
     %}}}
     %% plot {{{

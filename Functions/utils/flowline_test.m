@@ -1,9 +1,9 @@
-function [] = flowline_test(md, pos1, pos2, vel, u, v)
+function [master_flowline_dist, master_flowline_bed] = flowline_test(md, pos1, pos2, vel, u, v)
     %clear
     % close all
 
     glacier = 'Kangerlussuaq';
-    Nf = 2;
+    Nf = length(pos1);
 
     %% Load model {{{
     projPath = '/data/eigil/work/lia_kq/Models/Model_kangerlussuaq_lia_param.mat';
@@ -26,8 +26,12 @@ function [] = flowline_test(md, pos1, pos2, vel, u, v)
         % y0 = [-2294540, -2296520, -2298880];
         % x0 = [507680, 503080.707450693];
         % y0 = [-2297520, -2298408.27018442];
-        x0 = [pos1(1)];%, pos2(1)];
-        y0 = [pos2(1)];%, pos2(2)];
+        % x0 = [pos1(1)];%, pos2(1)];
+        % y0 = [pos2(1)];%, pos2(2)];
+        for i = 1: Nf
+            x0(i) = pos1(i);
+            y0(i) = pos2(i);
+        end
 
         xmin = 361900; xmax = 510001;
         ymin = -2310000; ymax = -2160900;
@@ -44,12 +48,7 @@ function [] = flowline_test(md, pos1, pos2, vel, u, v)
     % md = loadmodel('/data/eigil/work/lia_kq/Models/dec8_bed_corr/Model_kangerlussuaq_transient_budd.mat');
     %}}}
     %% create flowlines {{{
-    if plotflag
-        figure
-        plotmodel(md, 'data', md.results.StressbalanceSolution.Vel,...
-            'xlim', [xmin, xmax], 'ylim', [ymin, ymax], 'caxis', [0,10000])
-        hold on
-    end
+
     % northern and southern part of the glacier
     x = md.mesh.x;
     y = md.mesh.y;
@@ -59,6 +58,7 @@ function [] = flowline_test(md, pos1, pos2, vel, u, v)
     % [vel, u, v] = interpVelocity(md, data_vx, data_vy);
 
     if nargin < 3
+        disp('No velocity data given, using model velocity')
         vel = md.results.StressbalanceSolution.Vel;
         u = md.results.StressbalanceSolution.Vx;
         v = md.results.StressbalanceSolution.Vy;
@@ -75,7 +75,16 @@ function [] = flowline_test(md, pos1, pos2, vel, u, v)
     else
         fnameList = strcat('F', cellstr(num2str([1:Nf]')));
     end
+
+    if plotflag
+        figure(1)
+        plotmodel(md, 'data', vel,...
+            'xlim', [xmin, xmax], 'ylim', [ymin, ymax], 'caxis', [0,10000])
+        hold on
+    end
+
     % fnameList(1:3) = {'N', 'C', 'S'};
+    colors = {'r', 'b', 'g', 'm', 'c', 'k', 'y'};
     flowlineList = cell(length(x0), 1);
     ticks = -80;
     % compute the flowline
@@ -95,30 +104,39 @@ function [] = flowline_test(md, pos1, pos2, vel, u, v)
         % To visualize the flowlines
         [~,I] = min(abs(flowlineList{i}.Xmain-ticks));
         if plotflag
-            plot(flowlineList{i}.x, flowlineList{i}.y, 'Linewidth', 1.5, 'LineStyle', 'none', 'Marker', 'x');
-            plot(flowlineList{i}.x(I), flowlineList{i}.y(I), 'ko', 'Linewidth', 1.5);
+            plot(flowlineList{i}.x, flowlineList{i}.y, 'Linewidth', 1.5, 'LineStyle', 'none', 'Marker', 'x', 'Color', colors{i});
+            plot(flowlineList{i}.x(I), flowlineList{i}.y(I), 'o', 'Linewidth', 1.5, 'Color', colors{i});
         end
     end
 
     if plotflag
         hold on
-        plot(x0, y0, '*')
+        plot(x0, y0, 'o', 'Color', 'k')
     end
     %}}}
     %% Save data{{{
     if saveflag
-        save(['/data/eigil/work/lia_kq/KG_flowlines.mat'], 'x0', 'y0', 'flowlineList');
+        % save(['/data/eigil/work/lia_kq/KG_flowlines.mat'], 'x0', 'y0', 'flowlineList');
+        save(['/home/eyhli/IceModeling/work/calving_kg/Data/Flowlines/KG_flowlines.mat'], 'x0', 'y0', 'flowlineList');
     end
     %}}}
     %% plot {{{
     if plotflag
         figure(2)
         for i = 1: length(x0)
-            plot(flowlineList{i}.Xmain, flowlineList{i}.bed);
+            plot(flowlineList{i}.Xmain, flowlineList{i}.bed, 'x-','Color', colors{i}, 'Linewidth', 1.5);
+            % scatter(flowlineList{5}.Xmain(end-33), flowlineList{5}.bed(end-33), 10, 'k', 'filled');
+            xline(flowlineList{5}.Xmain(end-33), 'k', ':');
+            master_flowline_dist(:, i) = interpToFlowline(flowlineList{i}.x, flowlineList{i}.y, flowlineList{i}.Xmain', flowlineList{5}.x, flowlineList{5}.y);
+            master_flowline_bed(:, i) = interpToFlowline(flowlineList{i}.x, flowlineList{i}.y, flowlineList{i}.bed, flowlineList{5}.x, flowlineList{5}.y);
             hold on
         end
         % xlim([72, 95])
     end%}}}
+    hold off
+    % figure(3)
+    % mean(flowlineList{:}.Xmain, 1)
+    % plot(mean(flowlineList{:}.Xmain, 1), mean(flowlineList{:}.bed, 1));
     % figure(33)
     % index1 = 330;                                                 
     % plot(dist1(index1:end), bed1(index1:end)); hold on;

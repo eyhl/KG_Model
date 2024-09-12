@@ -33,8 +33,8 @@ end
 polygons = cell(numPolygons, 1);
 dates = datetime(zeros(numPolygons, 1), 0, 0);
 for i = 1:numPolygons
-    polygons_x{i} = S(i).X;
-    polygons_y{i} = S(i).Y;
+    polygons_x{i} = S(i).X ./ 1e3;
+    polygons_y{i} = S(i).Y ./ 1e3;
     dates(i) = datetime(S(i).Date); % Convert string date to numerical representation
 end
 
@@ -69,15 +69,14 @@ end
 % Plot the first 5 polygons with thicker lines, and on top of the other lines
 
 front_text_positions = 1e6 .* [[0.502877736700839 + 0.0003,  -2.298891691182671 + 0.0004]; ...
-                               [0.495629104131232 - 0.0030,  -2.297794533907547 - 0.0003]; ...
-                               [0.498357769238925 + 0.0002,  -2.293461077623015 + 0.0004]; ...
-                               [0.495629104131232 - 0.0010,  -2.297794533907547 - 0.0009]; ...
-                               [0.498017529657039 - 0.0015,  -2.298202624219884 - 0.0019]];  % 0.497906152280591 + 0.0004,  -2.295881278883940
+                               [0.495629104131232 - 0.0030,  -2.297794533907547 - 0.0015]; ...
+                               [0.498357769238925 + 0.0002,  -2.293461077623015 + 0.0014]; ...
+                               [0.498612804131232 - 0.0000,  -2.295894533907547 - 0.0000]; ...
+                               [0.498017529657039 + 0.0015,  -2.298202624219884 - 0.0025]] ./ 1e3;  % 0.497906152280591 + 0.0004,  -2.295881278883940
 
 front_text = {'1933', '1966', '1972', '1972', '1981'};
 
-
-line_thickness = [2, 3, 3, 3, 3];
+line_thickness = [2, 3, 2, 2, 2];
 for i = 1:5
     color = cmap2rgb(datesNormalized(i), cmap);
     color = cat(2, color);
@@ -89,13 +88,13 @@ for i = 1:5
 end
 
 % Create colorbar with date labels
-colormap(cmap);
+colormap(gca, cmap);
 % caxis([minDate maxDate]); % Set colorbar limits to match the date range
 cb = colorbar;
-cb.Label.String = 'Year';
+% cb.Label.String = 'Year';
 cb.Label.FontSize = 12;
 cb.Ticks = linspace(0, 1, 14); % Adjust the number of colorbar ticks as needed
 cb.TickLabels = cellstr(datestr(linspace(minDate, maxDate, 14), 'yyyy')); % Format the tick labels as desired
-cb.FontSize = 11;
+cb.FontSize = 12;
 
 

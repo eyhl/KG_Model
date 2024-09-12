@@ -224,13 +224,13 @@ classdef scalebar <handle
 		function SetXUnit(hobj,  varargin)
             value = hobj.XUnit;
 			if ishandle(hobj.hTextX)
-				set(hobj.hTextX, 'String', [num2str(hobj.XLen/1000),' ',value]);
+				set(hobj.hTextX, 'String', [num2str(hobj.XLen),' ',value]);
             end
 		end
 		function SetYUnit(hobj,  varargin)
             value = hobj.YUnit;
             if ishandle(hobj.hTextY)
-               set(hobj.hTextY, 'String',  [num2str(hobj.YLen/1000),' ',value]);
+               set(hobj.hTextY, 'String',  [num2str(hobj.YLen),' ',value]);
             end
         end
         function SetColor(hobj,  varargin)

@@ -10,6 +10,6 @@ function [interp_data] = interpToFlowline(x_data, y_data, data, x_flowline, y_fl
 % get the distance along the flowline from the calving front side
 % distance = distance + (100 - distance(end));
 % interpolate the data onto the flowline
-F = scatteredInterpolant(x_data, y_data, data, 'natural', 'none');
+F = scatteredInterpolant(x_data, y_data, data, 'natural', 'nearest');
 interp_data = F(x_flowline, y_flowline);
 end

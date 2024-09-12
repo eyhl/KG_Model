@@ -53,7 +53,7 @@ set(p1,'facealpha',1)
 colormap('turbo');
 caxis([-200 200]);
 c = colorbar();
-c.Label.String = 'Thinning 2003-2021 [m]';
+c.Label.String = 'Thinning 2003-2021 (m)';
 c.Label.Position = [3.4, 0];
 c.Label.FontSize = 12;
 c.FontSize = 12;
@@ -92,7 +92,7 @@ set(p1,'facealpha',1)
 colormap('turbo');
 caxis([-200 200]);
 c = colorbar();
-c.Label.String = 'Thinning 2003-2021 [m]';
+c.Label.String = 'Thinning 2003-2021 (m)';
 c.Label.Position = [3.4, 0];
 c.Label.FontSize = 12;
 c.FontSize = 12;
@@ -131,7 +131,7 @@ set(p1,'facealpha',1)
 colormap('turbo');
 caxis([-100 100]);
 c = colorbar();
-c.Label.String = 'Difference in thinning [m]';
+c.Label.String = 'Difference in thinning (m)';
 c.Label.Position = [3.4, 0];
 c.Label.FontSize = 12;
 c.FontSize = 12;

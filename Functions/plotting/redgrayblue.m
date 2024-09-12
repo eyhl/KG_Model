@@ -43,7 +43,3 @@ function c = redgrayblue(m)
     end
     
     c = [r g b];
-    
-    
-    
-    

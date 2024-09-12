@@ -1,4 +1,4 @@
-function [mass_balance_curve_struct, CM, all_names] = mass_loss_curves_comparing_front_obs(md_list, md_control_list, md_names, folder, validate, retreat_advance, yaxis_lim) %md1, md2, md3, md_control, folder)
+function [mass_balance_curve_struct, CM, all_names, leg] = mass_loss_curves_comparing_front_obs(md_list, md_control_list, md_names, folder, validate, retreat_advance, yaxis_lim) %md1, md2, md3, md_control, folder)
 
     if isfield(md_list(1), 'mesh') % the alternative is structs only holding relevant data, not the full model
         model_struct = true;
@@ -44,11 +44,11 @@ function [mass_balance_curve_struct, CM, all_names] = mass_loss_curves_comparing
     mass_balance_curve_struct.mouginot_eps = {};
     mass_balance_curve_struct.mouginot_offset = {};
     mass_balance_curve_struct.patches = {};
-    set(gcf,'Position',[100 100 1500 750])
+    % set(gcf,'Position',[100 100 1500 750])
 
     if retreat_advance
         % plot a retreat advance background
-        flowline = load("/home/eyhli/IceModeling/work/lia_kq/Data/validation/flowline_positions/central_flowline.mat");
+        flowline = load("/home/eyhli/IceModeling/work/lia_kq/Data/validation/flowline_positions/central_flowline.mat"); 
         flowline = flowline.flowlineList{:};
         try 
             distance_analysis = load("/home/eyhli/IceModeling/work/lia_kq/Data/validation/flowline_positions/distance_analysis.mat", 'distance_analysis');
@@ -112,7 +112,7 @@ function [mass_balance_curve_struct, CM, all_names] = mass_loss_curves_comparing
         else
             %% Volume plot 1
             if model_struct
-                vol1 = cell2mat({md.results.TransientSolution(:).IceVolume}) ./ (1e9) .* 0.9167;
+                vol1 = cell2mat({md.results.TransientSolution(:).IceVolume}) ./ (1e9) .* 0.9167; % Convert from m^3 km^3. 0.9167 is the density of ice in Gt/km^3, so this is Gt
                 vol_times1 = cell2mat({md.results.TransientSolution(:).time});
             else
                 vol1 = md.mass_balance{1};
@@ -129,7 +129,7 @@ function [mass_balance_curve_struct, CM, all_names] = mass_loss_curves_comparing
         if length(md_control_list) ~= 0
             md_control = md_control_list(i);
             if model_struct
-                vol_c = cell2mat({md_control.results.TransientSolution(:).IceVolume}) ./ (1e9) .* 0.917;
+                vol_c = cell2mat({md_control.results.TransientSolution(:).IceVolume}) ./ (1e9) .* 0.9167;
                 vol_times_c = cell2mat({md_control.results.TransientSolution(:).time});
                 q_times = md_control.levelset.spclevelset(end, :);
 
@@ -182,7 +182,7 @@ function [mass_balance_curve_struct, CM, all_names] = mass_loss_curves_comparing
         % plot(mouginot_time_span, cum_mb_1972_2018 + offset_prior_1972, '-', 'color', 'red', 'LineWidth', 1.5);
         % h = errorbar(mouginot_time_span, cum_mb_1972_2018, cum_mb_errors, '*', 'color', [0.25, 0.25, 0.25], 'LineWidth', 1.0);
         % h = errorbar(mouginot_time_span, cum_mb_1972_2018, cum_mb_errors, '*', 'color', [0.25, 0.25, 0.25], 'LineWidth', 1.0);
-        s1 = shadedErrorBar(mouginot_time_span, cum_mb_1972_2018, cum_mb_errors, 'lineProps', {'.','color',[.60,0.60,0.60], 'MarkerSize', 20}, 'patchSaturation', 0.1);
+        s1 = shadedErrorBar(mouginot_time_span, cum_mb_1972_2018, cum_mb_errors, 'lineProps', {'.','color',[.60,0.60,0.60], 'MarkerSize', 8}, 'patchSaturation', 0.1);
         set(s1.edge,'LineWidth',1.2,'LineStyle','--')
         mass_balance_curve_struct.mouginot_t{1} = mouginot_time_span;
         mass_balance_curve_struct.mouginot_mb{1} = cum_mb_1972_2018;
@@ -199,15 +199,15 @@ function [mass_balance_curve_struct, CM, all_names] = mass_loss_curves_comparing
         [~, ind] = min([mb0(index_1972), abbas_data.Var2(3)]);
         offset = s(ind) * dist(abbas_data.Var2(3), mb0(index_1972));
 
-        abbas_mb_relative = abbas_data.Var2(3:end) + offset + 27 + 24;
+        abbas_mb_relative = abbas_data.Var2(1:end) + offset + 27 + 24;
 
-        h = errorbar(abbas_data.Var1(3:end), abbas_mb_relative, abbas_data.Var3(3:end), '*', 'color', [0.65, 0.45, 0.65], 'LineWidth', 1.2);
+        h = errorbar(abbas_data.Var1(1:end), abbas_mb_relative, abbas_data.Var3(1:end), '*', 'color', [0.65, 0.45, 0.65], 'LineWidth', 1.0, 'MarkerSize', 4);
         % shadedErrorBar(abbas_data.Var1(3:end), abbas_mb_relative, abbas_data.Var3(3:end), 'lineProps', {'.','color',[.75,0.55,0.75]}, 'patchSaturation', 0.1)
 
     end
     if plot_smb
         %% Volume plot CONTROL
-        smb = cell2mat({md_list(1).results.TransientSolution(:).TotalSmb}) * 1e-12 * md_list(1).constants.yts; % from kg s^-1 to Gt/yr
+        smb = cell2mat({md_list(1).results.TransientSolution(:).TotalSmb}) * 1e-12 * md_list(1).constants.yts; % from kg s^-1 to Gt/yr !! TotalSMB is already in Gt/yr
         smb_times = cell2mat({md_list(1).results.TransientSolution(:).time});
         dt = diff(smb_times);
         dt = [dt dt(end)]; % duplicate last time step as simple padding;        
@@ -219,10 +219,10 @@ function [mass_balance_curve_struct, CM, all_names] = mass_loss_curves_comparing
 
     % scatter(vol_times_c(end), final_mass_loss, 'r');
     xlabel('Year')
-    ylabel('Mass [Gt]')
-    xlim([1933.0, 2021.1])
+    ylabel('Mass change (Gt)')
+    xlim([1933, 2021.1])
     ylim([yaxis_lim(1), yaxis_lim(2)])
-    set(gca,'fontsize', 12)
+    % set(gca,'fontsize', 12)
     Ax = gca;
     Ax.YGrid = 'on';
     Ax.XGrid = 'on';
@@ -231,19 +231,24 @@ function [mass_balance_curve_struct, CM, all_names] = mass_loss_curves_comparing
     Ax.LineWidth = 0.5;
     Ax.GridAlpha = 0.4;
 
-    all_names = md_names;
-    if validate
-        all_names = [all_names, "Mouginot et al. (2019)", "Khan et al. (2020)"];
+    if length(md_names) > 0
+        all_names = md_names;
+        if validate
+            all_names = [all_names, "Mouginot et al. (2019)", "Khan et al. (2020)"];
+        end
+        if retreat_advance
+            all_names = ["Advancing", "Retreating", all_names];
+        end
+        leg = legend([all_names], 'Location', 'SouthWest', 'Interpreter', 'latex', 'NumColumns', 2);
+    else
+        all_names = {};
+        leg = [];
     end
-    if retreat_advance
-        all_names = ["Advancing", "Retreating", all_names];
-    end
-    leg = legend([all_names], 'Location', 'SouthWest', 'FontSize', 12);
     % title(leg,'Extrapolation constant')
 
     folder = string(folder);
     if exist(folder, 'dir') == 7 % checks if folder is a folder, returns 7 if it is a folder
-        print(fullfile(folder, 'mass_balance_time_series.pdf'), '-dpdf', '-bestfit')
+        print(fullfile(folder, 'mass_balance_time_series.eps'), '-dpdf', '-r300')
         % exportgraphics(gcf, fullfile(folder, 'mass_balance_time_series.png'), 'Resolution', 300)
     end
 

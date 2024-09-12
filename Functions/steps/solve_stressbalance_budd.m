@@ -5,8 +5,8 @@ function [md] = solve_stressbalance_budd(md, coefs, cb_min, cb_max, velocity_exp
     md = sethydrostaticmask(md);
 
     % fix floating hole
-    pos = find(ContourToNodes(md.mesh.x, md.mesh.y, '/home/eyhli/IceModeling/work/lia_kq/floating_hole.exp', 2));
-    md.mask.ocean_levelset(pos) = 100;
+    % pos = find(ContourToNodes(md.mesh.x, md.mesh.y, '/home/eyhli/IceModeling/work/lia_kq/floating_hole.exp', 2));
+    % md.mask.ocean_levelset(pos) = 100;
     % md = make_floating(md);
 
     % Control general
@@ -28,7 +28,7 @@ function [md] = solve_stressbalance_budd(md, coefs, cb_min, cb_max, velocity_exp
     pos = find(isnan(md.inversion.vel_obs) | md.inversion.vel_obs == 0);
     md.inversion.cost_functions_coefficients(pos, 1:2) = 0;
 
-    pos = find(ContourToNodes(md.mesh.x, md.mesh.y, '/home/eyhli/IceModeling/work/lia_kq/ignore_tip_of_domain.exp', 2));
+    % pos = find(ContourToNodes(md.mesh.x, md.mesh.y, '/home/eyhli/IceModeling/work/lia_kq/ignore_tip_of_domain.exp', 2));
     % md.inversion.cost_functions_coefficients(pos, 1:2) = 0;
 
     % % floating ice (done automatically in C++)

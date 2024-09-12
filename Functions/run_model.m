@@ -171,7 +171,7 @@ function [md] = run_model(config_name, plotting_flag)
 			damage(margins_pos) = config.add_damage; % from S. Cook 2021 https://doi.org/10.1017/jog.2021.109, who got it from somewhere else, which is a little more obscure.
             %disp(size(damage))
             %disp(size(md.materials.rheology_B))
-			md.materials.rheology_B = 1 ./ ((damage).^(1/3)) .* md.materials.rheology_B;
+			md.materials.rheology_B = 1 ./ ((damage).^(1/3)) .* md.materials.rheology_B; % see Greve and Blatter 2009, p. 58, eq. 4.35
 		elseif (config.add_damage == 0)
 			disp([' No damage to shear margin']);
 		else
