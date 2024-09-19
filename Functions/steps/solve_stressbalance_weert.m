@@ -1,9 +1,19 @@
 function [md] = solve_stressbalance_weert(md, coefs, cw_min, cw_max)
     md = sethydrostaticmask(md);
     md.friction = frictionweertman();
+    % initial guess if given
+    % try
+    %     disp('Using initial guess')
+    %     md.friction.C = mdb.results.StressbalanceSolution.FrictionCoefficient;
+    %     % normalize
+    %     md.friction.C = (md.friction.C - min(md.friction.C)) / (max(md.friction.C) - min(md.friction.C));
+    %     md.friction.C = 800 .* md.friction.C;
+    % catch
+    %     md.friction.C = 3000 * ones(md.mesh.numberofvertices,1);
+    % end
     m = 3.0;
     md.friction.m = m * ones(md.mesh.numberofelements,1);
-    md.friction.C = 3000 * ones(md.mesh.numberofvertices,1);
+    md.friction.C = 1150 * ones(md.mesh.numberofvertices,1);
 
     % Control general
     md.inversion = m1qn3inversion(md.inversion);
@@ -31,7 +41,8 @@ function [md] = solve_stressbalance_weert(md, coefs, cw_min, cw_max)
     md.inversion.min_parameters = cw_min * ones(md.mesh.numberofvertices, 1);
     md.inversion.max_parameters = cw_max * ones(md.mesh.numberofvertices, 1);
     md.inversion.control_scaling_factors = 1;
-    md.inversion.dxmin = 1e-20;
+    md.inversion.gttol = 1e-10;
+    md.inversion.dxmin = 1e-30;
 
     %Additional parameters
     md.stressbalance.restol = 0.01; % mechanical equilibrium residual convergence criterion

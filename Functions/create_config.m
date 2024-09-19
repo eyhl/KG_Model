@@ -13,9 +13,9 @@ function [config_file_name] = create_config(id, friction_law)
     front_observation_path = "/home/eyhli/IceModeling/work/lia_kq/Data/shape/fronts/processed/1933.shp";
 
     % Set parameters
-    steps = [3, 7, 8, 9, 10]; % 3=budd, 6=schoof
-    start_time = 1980;
-    final_time = 1981;
+    steps = [5]; % 3=budd, 6=schoof
+    start_time = 2007;
+    final_time = 2021;
     ice_temp_offset = 0; % C
     lia_friction_offset = 15;
     output_frequency = 1; % output frequency for transient run

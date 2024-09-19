@@ -15,7 +15,7 @@ function mass_balance_rate_components = compute_mass_balance_components(md, flag
             if mod(t, 1000) == 0
                 fprintf('Computing volume above floatation for time step %d\n', t);
             end
-            V(t) = VolumeAboveFloatation(md, t, flags);
+            V(t) = VolumeAboveFloatation(md, t, flags); % this already only focuses ice areas (i.e. uses MaskIceLevelset)
         end
         mass_balance_af = V ./ (1e9) .* 0.9167; % convert to Gt
         smb = cell2mat({md.results.TransientSolution(:).SmbMassBalance});

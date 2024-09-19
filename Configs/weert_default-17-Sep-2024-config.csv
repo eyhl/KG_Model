@@ -1,0 +1,2 @@
+todays_date,steps,start_time,final_time,output_frequency,ice_temp_offset,lia_friction_offset,cf_weights_1,cf_weights_2,cf_weights_3,cs_min,cs_max,velocity_exponent,add_damage,melting_rate,smb_name,friction_extrapolation,friction_law,polynomial_order,glacier_name,control_run,front_observation_path
+"17-Sep-2024","5",2007,2021,1,0,15,20000,2,7.5e-08,0.01,10000,1,5,20,"racmo","bed_correlation","weertman",4,"KG",0,"/home/eyhli/IceModeling/work/lia_kq/Data/shape/fronts/processed/1933.shp"

@@ -257,6 +257,7 @@ function [md] = run_model(config_name, plotting_flag)
     if perform(org, 'weertman')
 
         md = loadmodel([append(base_path, 'Models/'), prefix, 'param.mat']);
+        % md = loadmodel('Models/KG_budd.mat');
         md = solve_stressbalance_weert(md, weertman_coeff, cs_min, cs_max);
         savemodel(org, md);
 
